@@ -26,8 +26,8 @@ public class Solution {
 
     public void preorderTraversalWithAccumulator(TreeNode root, List<Integer> acc) {
         acc.add(root.val);
-        if (root.left != null) acc.addAll(preorderTraversal(root.left));
-        if (root.right != null) acc.addAll(preorderTraversal(root.right));
+        if (root.left != null) preorderTraversalWithAccumulator(root.left, acc);
+        if (root.right != null) preorderTraversalWithAccumulator(root.right, acc);
     }
     
 public class TreeNode {
