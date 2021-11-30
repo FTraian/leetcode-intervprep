@@ -1,20 +1,17 @@
 package hard.lru_cache;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 class LRUCache {
 
     private final int capacity;
     private final Map<Integer, CacheElement> cache;
-    private final PriorityQueue<CacheElement> queue;
+    private final Deque<CacheElement> queue;
 
     public LRUCache(int capacity) {
         this.capacity = capacity;
         cache = new HashMap<>(capacity);
-        queue = new PriorityQueue<>(capacity);
+        queue = new LinkedList<>();
     }
 
     public int get(int key) {
@@ -24,48 +21,57 @@ class LRUCache {
         }
 
         queue.remove(e);
-        e.lruTimestamp = System.currentTimeMillis();
-        queue.add(e);
+        queue.addLast(e);
         return e.value;
     }
 
     public void put(int key, int value) {
-        if (cache.size() + 1 > capacity) {
-            CacheElement head = queue.poll();
-            cache.remove(head.key, head);
+        if (cache.get(key) == null && cache.size() + 1 > capacity) {
+            CacheElement head = queue.pollFirst();
+            cache.remove(head.key);
         }
-        CacheElement e = new CacheElement();
-        e.key = key;
-        e.value = value;
-        e.lruTimestamp = System.currentTimeMillis();
-        cache.put(key, e);
-        queue.add(e);
+
+        CacheElement e;
+        if (cache.get(key) != null) {
+            e = cache.get(key);
+            queue.remove(e);
+            e.value = value;
+
+            cache.put(key, e);
+            queue.addLast(e);
+        } else {
+            e = new CacheElement();
+            e.key = key;
+            e.value = value;
+
+            cache.put(key, e);
+            queue.addLast(e);
+        }
     }
 
     class CacheElement implements Comparable<CacheElement> {
 
         Integer key;
         Integer value;
-        long lruTimestamp;
 
         @Override
         public int compareTo(CacheElement o) {
-            return (int) (this.lruTimestamp - o.lruTimestamp);
+            return this.key - o.key;
         }
     }
 
     public static void main(String[] args) {
 //        [[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]
         LRUCache cache = new LRUCache(2);
-        cache.put(1, 1);
+        cache.put(2, 1);
         cache.put(2, 2);
-        System.out.println(cache.get(1));
-        cache.put(3, 3);
         System.out.println(cache.get(2));
-        cache.put(4, 4);
-        System.out.println(cache.get(1));
-        System.out.println(cache.get(3));
-        System.out.println(cache.get(4));
+        cache.put(1, 1);
+//        System.out.println(cache.get(2));
+        cache.put(4, 1);
+        System.out.println(cache.get(2));
+//        System.out.println(cache.get(3));
+//        System.out.println(cache.get(4));
     }
 
 }
