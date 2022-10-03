@@ -3,6 +3,7 @@
         "src/medium/odd_even_linked_list",
         "src/medium/divide_two_integers",
         "src/learn/DFS",
-        "src/google/unique_email_addresses"
+        "src/google/unique_email_addresses",
+        "src"
     ]
 }
